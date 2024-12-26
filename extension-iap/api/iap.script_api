@@ -1,6 +1,6 @@
 - name: iap
-  type: table
-  desc: Functions and constants for doing in-app purchases. Supported on iOS, Android (Google Play and Amazon)
+  type: table 
+  desc: Functions and constants for doing in-app purchases. Supported on iOS, Android (Google Play and Amazon) 
         and Facebook Canvas platforms.
         [icon:ios] [icon:googleplay] [icon:amazon] [icon:facebook]
   members:
@@ -9,7 +9,7 @@
 
   - name: buy
     type: function
-    desc: Purchase a product.
+    desc: Sets the listener function for In-app purchase events.
     parameters:
       - name: id
         type: string
@@ -21,12 +21,8 @@
         members:
         - name: request_id
           type: string
-          desc: Facebook only [icon:facebook]. Optional custom unique request id to
+          desc: Facebook only. [icon:facebook] Optional custom unique request id to
                 set for this transaction. The id becomes attached to the payment within the Graph API.
-        - name: token
-          type: string
-          desc: Google Play only [icon:googleplay]. Which subscription offer to use when buying a subscription. The token can be retrieved from
-                the subscriptions table returned when calling iap.list()
 
     examples:
       - desc: |-
@@ -60,18 +56,6 @@
           if `auto_finish_transactions` is disabled in project settings. Calling this function
           with `auto_finish_transactions` set will be ignored and a warning is printed.
           The `transaction.state` field must equal `iap.TRANS_STATE_PURCHASED`.
-    parameters:
-      - name: transaction
-        type: table
-        desc: transaction table parameter as supplied in listener callback
-
-#*****************************************************************************************************
-
-  - name: acknowledge
-    type: function
-    desc: Acknowledge a transaction.
-        [icon:attention] Calling iap.acknowledge is required on a successful transaction on Google
-        Play unless iap.finish is called. The transaction.state field must equal iap.TRANS_STATE_PURCHASED.
     parameters:
       - name: transaction
         type: table
@@ -132,56 +116,15 @@
         - name: price
           type: number
           desc: The price of the product.
-                For Google Play [icon:googleplay] this is used only for in-app products
 
         - name: price_string
           type: string
           desc: The price of the product, as a formatted string (amount and currency symbol).
-                For Google Play [icon:googleplay] this is used only for in-app products
 
         - name: currency_code
           type: string
-          desc: The currency code.
-                For Google Play [icon:googleplay] this is the merchant's locale, instead of the user's.
-                For Google Play [icon:googleplay] this is used only for in-app products
-
-        - name: subscriptions
-          type: table
-          desc: Only available for Google Play [icon:googleplay]. List of subscription offers.
-                Each offer contains a token and a list of price and billing options.
-                See https://developer.android.com/reference/com/android/billingclient/api/ProductDetails.PricingPhase
-          members:
-          - name: token
-            type: string
-            desc: The token associated with the pricing phases for the subscription.
-
-          - name: pricing
-            type: table
-            desc: The pricing phases for the subscription.
-            members:
-            - name: price_string
-              type: string
-              desc: Formatted price for the payment cycle, including currency sign.
-
-            - name: price
-              type: number
-              desc: Price of the payment cycle in micro-units.
-
-            - name: currency_code
-              type: string
-              desc: ISO 4217 currency code
-
-            - name: billing_period
-              type: string
-              desc: Billing period of the payment cycle, specified in ISO 8601 format
-
-            - name: billing_cycle_count
-              type: number
-              desc: Number of cycles for which the billing period is applied.
-
-            - name: recurrence_mode
-              type: string
-              desc: FINITE, INFINITE or NONE
+          desc: The currency code. On Google Play, this reflects the merchant's locale, instead of the user's.
+                [icon:ios] [icon:googleplay] [icon:facebook]
 
       - name: error
         type: table
@@ -260,7 +203,7 @@
 
         - name: trans_ident
           type: string
-          desc: The transaction identifier. This field is only set when `state` is
+          desc: The transaction identifier. This field is only set when `state` is 
                 `TRANS_STATE_RESTORED`, `TRANS_STATE_UNVERIFIED` or `TRANS_STATE_PURCHASED`.
 
         - name: receipt
@@ -269,36 +212,32 @@
 
         - name: original_trans
           type: string
-          desc: Apple only [icon:apple]. The original transaction. This field is only set when `state` is `TRANS_STATE_RESTORED`.
-
-        - name: original_json
-          type: string
-          desc: Android only [icon:android]. The purchase order details in JSON format.
+          desc: Apple only[icon:apple]. The original transaction. This field is only set when `state` is `TRANS_STATE_RESTORED`.
 
         - name: signature
           type: string
-          desc: Google Play only [icon:googleplay]. A string containing the signature of the purchase data that was signed with the private key of the developer.
+          desc: Google Play only[icon:googleplay]. A string containing the signature of the purchase data that was signed with the private key of the developer.
 
         - name: request_id
           type: string
-          desc: Facebook only [icon:facebook]. This field is set to the optional custom unique request id `request_id` if set in the `iap.buy()` call parameters.
+          desc: Facebook only[icon:facebook]. This field is set to the optional custom unique request id `request_id` if set in the `iap.buy()` call parameters.
 
         - name: user_id
           type: string
-          desc: Amazon Pay only [icon:amazon]. The user ID.
+          desc: Amazon Pay only[icon:amazon]. The user ID.
 
         - name: is_sandbox_mode
           type: boolean
-          desc: Amazon Pay only [icon:amazon]. If `true`, the SDK is running in Sandbox mode.
+          desc: Amazon Pay only[icon:amazon]. If `true`, the SDK is running in Sandbox mode.
                 This only allows interactions with the Amazon AppTester. Use this mode only for testing locally.
 
         - name: cancel_date
           type: string
-          desc: Amazon Pay only [icon:amazon]. The cancel date for the purchase. This field is only set if the purchase is canceled.
+          desc: Amazon Pay only[icon:amazon]. The cancel date for the purchase. This field is only set if the purchase is canceled.
 
         - name: canceled
           type: string
-          desc: Amazon Pay only [icon:amazon]. Is set to `true` if the receipt was canceled or has expired; otherwise `false`.
+          desc: Amazon Pay only[icon:amazon]. Is set to `true` if the receipt was canceled or has expired; otherwise `false`.
 
       - name: error
         type: table
@@ -314,45 +253,47 @@
   - name: PROVIDER_ID_AMAZON
     type: number
     desc: provider id for Amazon
-
+    
   - name: PROVIDER_ID_APPLE
     type: number
     desc: provider id for Apple
-
+    
   - name: PROVIDER_ID_FACEBOOK
     type: number
     desc: provider id for Facebook
-
+    
   - name: PROVIDER_ID_GOOGLE
     type: number
     desc: iap provider id for Google
-
+    
   - name: REASON_UNSPECIFIED
     type: number
     desc: unspecified error reason
-
+    
   - name: REASON_USER_CANCELED
     type: number
     desc: user canceled reason
-
+    
   - name: TRANS_STATE_FAILED
     type: number
     desc: transaction failed state
-
+    
   - name: TRANS_STATE_PURCHASED
     type: number
     desc: transaction purchased state
-
+    
   - name: TRANS_STATE_PURCHASING
     type: number
     desc: transaction purchasing state
           This is an intermediate mode followed by TRANS_STATE_PURCHASED. Store provider support dependent.
-
+    
   - name: TRANS_STATE_RESTORED
     type: number
     desc: transaction restored state
           This is only available on store providers supporting restoring purchases.
-
+    
   - name: TRANS_STATE_UNVERIFIED
     type: number
     desc: transaction unverified state, requires verification of purchase
+    
+    

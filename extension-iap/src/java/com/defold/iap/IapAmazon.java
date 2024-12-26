@@ -11,7 +11,6 @@ import java.util.concurrent.BlockingQueue;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -46,7 +45,6 @@ public class IapAmazon implements PurchasingListener {
         this.activity = activity;
         this.autoFinishTransactions = autoFinishTransactions;
         this.listProductsListeners = new HashMap<RequestId, IListProductsListener>();
-        this.listProductsCommandPtrs = new HashMap<RequestId, Long>();
         this.purchaseListeners = new HashMap<RequestId, IPurchaseListener>();
         PurchasingService.registerListener(activity, this);
     }
@@ -81,7 +79,7 @@ public class IapAmazon implements PurchasingListener {
         }
     }
 
-    public void buy(final String product, final String token, final IPurchaseListener listener) {
+    public void buy(final String product, final IPurchaseListener listener) {
         synchronized (purchaseListeners) {
             RequestId req = PurchasingService.purchase(product);
             if (req != null) {
@@ -97,10 +95,6 @@ public class IapAmazon implements PurchasingListener {
             return;
         }
         PurchasingService.notifyFulfillment(receipt, FulfillmentResult.FULFILLED);
-    }
-    
-    public void acknowledgeTransaction(final String purchaseToken, final IPurchaseListener purchaseListener) {
-        // Stub to prevent errors.
     }
 
     private void doGetPurchaseUpdates(final IPurchaseListener listener, final boolean reset) {
@@ -174,13 +168,9 @@ public class IapAmazon implements PurchasingListener {
         if (productDataResponse.getRequestStatus() != ProductDataResponse.RequestStatus.SUCCESSFUL) {
             listener.onProductsResult(IapJNI.BILLING_RESPONSE_RESULT_ERROR, null, commadPtr);
         } else {
-            for (final String s : productDataResponse.getUnavailableSkus()) {
-                Log.v(TAG, "Unavailable SKU: " + s);
-            }
-
             Map<String, Product> products = productDataResponse.getProductData();
             try {
-                JSONArray data = new JSONArray();
+                JSONObject data = new JSONObject();
                 for (Map.Entry<String, Product> entry : products.entrySet()) {
                     String key = entry.getKey();
                     Product product = entry.getValue();
@@ -194,7 +184,7 @@ public class IapAmazon implements PurchasingListener {
                         // Based on return values from getPrice: https://developer.amazon.com/public/binaries/content/assets/javadoc/in-app-purchasing-api/com/amazon/inapp/purchasing/item.html
                         item.put("price", priceString.replaceAll("[^0-9.,]", ""));
                     }
-                    data.put(item);
+                    data.put(key, item);
                 }
                 listener.onProductsResult(IapJNI.BILLING_RESPONSE_RESULT_OK, data.toString(), commadPtr);
             } catch (JSONException e) {

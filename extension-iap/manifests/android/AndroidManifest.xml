@@ -3,11 +3,19 @@
     package="{{android.package}}">
 <uses-sdk android:minSdkVersion="{{android.minimum_sdk_version}}" android:targetSdkVersion="{{android.target_sdk_version}}" />
     <application>
-        <!-- For Amazon IAP -->
-        <receiver android:exported="true" android:name="com.amazon.device.iap.ResponseReceiver" android:permission="com.amazon.inapp.purchasing.Permission.NOTIFY">
-            <intent-filter>
-                <action android:name="com.amazon.inapp.purchasing.NOTIFY" />
-            </intent-filter>
-        </receiver>
+        
+        <!-- For IAP -->
+        <activity android:name="com.defold.iap.IapGooglePlayActivity"
+          android:theme="@android:style/Theme.Translucent.NoTitleBar"
+          android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+          android:label="IAP">
+        </activity>
+
     </application>
+    <queries>
+        <package android:name="com.farsitel.bazaar" />
+    </queries>
+
+    <uses-permission android:name="com.farsitel.bazaar.permission.PAY_THROUGH_BAZAAR" />
+    
 </manifest>

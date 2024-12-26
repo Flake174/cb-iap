@@ -92,6 +92,7 @@ void IAP_PushConstants(lua_State* L)
         SETCONSTANT(PROVIDER_ID_AMAZON)
         SETCONSTANT(PROVIDER_ID_APPLE)
         SETCONSTANT(PROVIDER_ID_FACEBOOK)
+        SETCONSTANT(PROVIDER_ID_BAZAAR)
 
     #undef SETCONSTANT
 }
@@ -121,7 +122,6 @@ void IAP_Queue_Push(IAPCommandQueue* queue, IAPCommand* cmd)
 void IAP_Queue_Flush(IAPCommandQueue* queue, IAPCommandFn fn, void* ctx)
 {
     assert(fn != 0);
-
     if (queue->m_Commands.Empty())
     {
         return;
