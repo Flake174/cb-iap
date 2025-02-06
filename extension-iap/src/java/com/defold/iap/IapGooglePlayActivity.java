@@ -78,10 +78,14 @@ public class IapGooglePlayActivity extends Activity {
             int response = getResponseCodeFromBundle(buyIntentBundle);
             if (response == IapJNI.BILLING_RESPONSE_RESULT_OK) {
                 hasPendingPurchases = true;
-                ActivityOptions options = ActivityOptions.makeBasic()
-                    .setPendingIntentBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
                 PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
-                startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), options.toBundle());
+                if (android.os.Build.VERSION.SDK_INT >= 34) {
+                    ActivityOptions options = ActivityOptions.makeBasic()
+                            .setPendingIntentBackgroundActivityStartMode(ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
+                    startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), options.toBundle());
+                } else {
+                    startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0));
+                }
             } else if (response == IapJNI.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED) {
                 sendBuyError(IapJNI.BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED);
             } else {
@@ -261,7 +265,11 @@ public class IapGooglePlayActivity extends Activity {
                 }
             };
 
-            bindService(serviceIntent, serviceConn, Context.BIND_ALLOW_ACTIVITY_STARTS | Context.BIND_AUTO_CREATE);
+            if (android.os.Build.VERSION.SDK_INT >= 34) {
+                bindService(serviceIntent, serviceConn, Context.BIND_ALLOW_ACTIVITY_STARTS | Context.BIND_AUTO_CREATE);
+            } else {
+                bindService(serviceIntent, serviceConn, Context.BIND_AUTO_CREATE);
+            }
         } else {
             // Service will never be connected; just send unavailability message
             Bundle bundle = new Bundle();
