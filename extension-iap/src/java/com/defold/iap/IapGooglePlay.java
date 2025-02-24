@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -290,26 +292,52 @@ public class IapGooglePlay implements Handler.Callback {
         }));
     }
 
+    private static String parseFarsi(String priceString) {
+        Map<Character, Character> persianToArabic = new HashMap<>();
+        persianToArabic.put('٠', '0');
+        persianToArabic.put('١', '1');
+        persianToArabic.put('٢', '2');
+        persianToArabic.put('٣', '3');
+        persianToArabic.put('٤', '4');
+        persianToArabic.put('٥', '5');
+        persianToArabic.put('٦', '6');
+        persianToArabic.put('٧', '7');
+        persianToArabic.put('٨', '8');
+        persianToArabic.put('٩', '9');
+        persianToArabic.put('۰', '0');
+        persianToArabic.put('۱', '1');
+        persianToArabic.put('۲', '2');
+        persianToArabic.put('۳', '3');
+        persianToArabic.put('۴', '4');
+        persianToArabic.put('۵', '5');
+        persianToArabic.put('۶', '6');
+        persianToArabic.put('۷', '7');
+        persianToArabic.put('۸', '8');
+        persianToArabic.put('۹', '9');
+
+        StringBuilder result = new StringBuilder();
+
+        for (char c : priceString.toCharArray()) {
+            if (persianToArabic.containsKey(c)) {
+                result.append(persianToArabic.get(c));
+            }
+        }
+        return result.toString();
+    }
+
     // Convert the product data into the generic format shared between all Defold IAP implementations
     private static JSONObject convertProduct(JSONObject product) {
         try {
             // Deep copy and modify
             JSONObject p = new JSONObject(product.toString());
-            p.put("price_string", p.get("price"));
+            String currency_code = "IRR";
+            String price_string = p.get("price");
+            String parsed_price = parseFarsi(price_string);
+            String parsed_price_string = parsed_price.append(" rials");
+            p.put("price_string", parsed_price_string);
             p.put("ident", p.get("productId"));
-            // It is not yet possible to obtain the price (num) and currency code on Android for the correct locale/region.
-            // They have a currency code (price_currency_code), which reflects the merchant's locale, instead of the user's
-            // https://code.google.com/p/marketbilling/issues/detail?id=93&q=currency%20code&colspec=ID%20Type%20Status%20Google%20Priority%20Milestone%20Owner%20Summary
-            double price = 0.0;
-            if (p.has("price_amount_micros")) {
-                price = p.getLong("price_amount_micros") * 0.000001;
-            }
-            String currency_code = "Unknown";
-            if (p.has("price_currency_code")) {
-                currency_code = (String)p.get("price_currency_code");
-            }
+            p.put("price", parsed_price);
             p.put("currency_code", currency_code);
-            p.put("price", price);
 
             p.remove("productId");
             p.remove("type");
