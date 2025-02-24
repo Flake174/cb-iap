@@ -331,9 +331,9 @@ public class IapGooglePlay implements Handler.Callback {
             // Deep copy and modify
             JSONObject p = new JSONObject(product.toString());
             String currency_code = "IRR";
-            String price_string = p.get("price");
+            String price_string = p.get("price").toString();
             String parsed_price = parseFarsi(price_string);
-            String parsed_price_string = parsed_price.append(" rials");
+            String parsed_price_string = parsed_price + " rials";
             p.put("price_string", parsed_price_string);
             p.put("ident", p.get("productId"));
             p.put("price", parsed_price);
